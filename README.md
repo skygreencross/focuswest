@@ -1,76 +1,85 @@
 # Focus West — Interactive Pitch Deck
 
-A single-file HTML pitch deck for Focus West, rebuilt from the existing `focus_founder_led_coffee_pitch_v8` Google Slides deck. All client-specific content lives in `data.json` so the deck can be repointed at a new client by swapping one file.
+A modern HTML5 sell-side pitch deck for [Focus West](https://focusbankers.com), a division of FOCUS Investment Banking.
 
-## Files
+The deck is a 16-section interactive experience with a Waikiki street-map snapshot, live valuation sensitivity slider, fee calculator, net-proceeds waterfall, comparable-transactions panel, drag-to-reorder priority cards, animated process funnel, draggable roadmap marker, audio narration player, and a client-side password gate. Bundles into a single self-contained HTML file that works offline.
 
-- `index.html` — the deck. Self-contained except for Google Fonts and `data.json`.
-- `data.json` — every piece of client-specific content. Schema mirrors what would be Google Sheets columns.
-- `README.md` — this file.
+---
 
-## Running locally
+## Quick start
 
-`fetch('./data.json')` will not work from `file://` in most browsers due to CORS. Serve over HTTP:
+```bash
+# Install Node (if you don't have it): https://nodejs.org — anything ≥ 18 works
+# No other dependencies. No npm install required.
 
+npm run build       # bundle src/ → dist/index.html
+npm run start       # build + open the deck in your default browser
+npm run preview     # open the last build without rebuilding
 ```
-cd outputs
+
+To iterate quickly without rebuilding on every change, serve `src/` directly:
+
+```bash
+cd src
 python3 -m http.server 8000
 # then open http://localhost:8000/
 ```
 
-If you double-click the HTML and the data doesn't load, the deck falls back to an inline copy of the data so it still renders — but for real editing, use the local server.
+Edits to `src/styles.css`, `src/app.js`, or `src/data.json` show up on refresh.
 
-## Controls
+The current access code (set in `src/app.js`, near the bottom): `aroma2026`.
 
-- **Scroll** or **↓ / ↑ / PageDown / PageUp / Space** — section nav
-- **Home / End** — first / last section
-- **F** — presentation mode (fullscreen + section-snap scrolling)
-- **Esc** — exit presentation mode
-- **Side dots** — jump to any section (hover for label)
+---
 
-## Swapping clients
+## Project structure
 
-Edit `data.json`. The schema is documented in the `_meta` block. Key sections:
+```
+focuswest-hawaiianaroma/
+├── src/                     ← edit these
+│   ├── index.html           ← markup template
+│   ├── styles.css           ← all CSS
+│   ├── app.js               ← all JS
+│   ├── data.json            ← all client content
+│   └── team-photos/         ← team JPGs
+│
+├── dist/                    ← generated; don't edit
+│   └── index.html           ← shippable single-file deck (~619 KB)
+│
+├── audio-narration/         ← drop MP3s here for the narration player (optional)
+├── build.js                 ← bundler (no dependencies)
+├── package.json
+│
+├── README.md                ← this file
+├── CLAUDE.md                ← project primer for Claude Code (auto-loaded)
+├── BACKEND_BRIEF.md         ← spec for the next phase (Google Sheets backend)
+├── NARRATION_SCRIPTS.md     ← per-section narration scripts for TTS
+└── DEPLOY.md                ← how to ship to Netlify / GitHub Pages
+```
 
-- `client` — company name, industry, deck type, date
-- `cover.headline_*` — hero copy on the cover
-- `team[]` — partner bios (name, title, initials, bullets)
-- `platform_stats[]` — the four large stats on the platform slide
-- `founder_values[]` — the six "what matters" cards
-- `buyers[]` — the four buyer category cards
-- `process_steps[]` / `process_funnel[]` — the three-step process + funnel numbers
-- `value_drivers[]` — the eight driver cards
-- `valuation` — every number on the valuation page. All multiples and implied ranges are explicit fields so you can edit any one without recalculating.
-- `engagement_terms[]` — the four terms rows
-- `roadmap[]` — the three roadmap windows. `weeks_start`/`weeks_end` drive the Gantt bar widths (out of 26 total weeks).
-- `disclaimer` — the legal text
+---
 
-## Migrating to Google Sheets (in Code)
+## What's built (v1.1)
 
-The data shape is intentionally flat-row-friendly. Suggested approach:
+- 16 sections covering the full sell-side narrative — cover, snapshot, team, platform, founder values, buyer strategy, process, risks, value drivers, valuation, comparables, scenarios, founder takeaway (waterfall), engagement terms, roadmap, disclaimer.
+- ~15 interactive widgets: valuation slider, fee calculator, scenario picker, net-proceeds waterfall with 4 live inputs, drag-to-reorder priority cards, hover-revealed sparklines, draggable roadmap marker, audio narration player, animated process funnel, count-up stats.
+- Champagne accent (`#D4B36A`) with sage secondary (`#95C5A4`); inverts cleanly in print.
+- Single self-contained build output. No build pipeline beyond `node build.js`. No external dependencies at runtime except Google Fonts.
+- Client-side password gate. Free-tier-host-friendly. (Not real auth — see `BACKEND_BRIEF.md` for the upgrade path.)
 
-1. **Sheet structure.** One workbook per pitch. Tabs named to match the JSON keys (`client`, `team`, `valuation`, etc.). Single-value sections become two-column key/value tabs; array sections become regular tables with a header row matching the JSON field names.
-2. **Backend.** A thin serverless endpoint (Cloudflare Worker, Vercel function, GAS web app) that reads the sheet and shapes it into the exact JSON structure of `data.json`. Easiest: Apps Script bound to the sheet, deployed as a web app, returning `JSON.stringify(buildPayload())`.
-3. **Frontend swap.** In `index.html`, change:
-   ```js
-   const res = await fetch('./data.json');
-   ```
-   to:
-   ```js
-   const res = await fetch(`/api/pitch?client=${clientId}`);
-   ```
-   That's it — the render code doesn't change.
-4. **Multi-client.** Each row in a top-level "Pitches" sheet points to a client-specific sub-sheet; the API resolves `?client=` to the right sheet ID. The URL `pitch.focuswest.com/companya` renders the Company A deck; `/companyb` renders Company B.
+---
 
-## Brand notes
+## What's next
 
-- Accent green (`#7BE0AD`) is set in one place — the `:root` `--accent` CSS variable. Swap it once and every accent updates.
-- Typography pairs Fraunces (display serif) + Inter (body grotesque) + JetBrains Mono (data labels). All from Google Fonts.
-- Header treats Focus West as the primary mark with a small "A division of Focus Investment Banking" endorsement to keep parent-brand visibility.
-- Three wordmark directions were sketched separately in chat — the deck currently uses Option A. To switch to Option B or C, replace the `.brand` block in `index.html`.
+See `BACKEND_BRIEF.md` for Phase 2 — multi-tenancy via a Google Apps Script backend pointed at a Google Sheet, so the Focus West team can add a new client deck by adding a row.
 
-## Known limitations
+---
 
-- Team avatars use initials, not photos. Swap each `team-avatar` div for an `<img>` once photos exist.
-- Print/PDF export is not styled. If you need a one-pager fallback, add a `@media print` block.
-- The roadmap Gantt assumes a 26-week total. If `weeks_end` for any item exceeds 26 in `data.json`, bars will overflow — adjust the divisor in the `roadmapBars` render block.
+## Credits
+
+Map data on the Snapshot slide is a stylized rendering based on geographic reference data from OpenStreetMap, © OpenStreetMap contributors, used under the Open Database License.
+
+---
+
+## License
+
+Proprietary — Focus Investment Banking LLC. All rights reserved.

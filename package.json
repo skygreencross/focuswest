@@ -1,0 +1,17 @@
+{
+  "name": "focus-west-pitch",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Interactive HTML pitch deck for Focus West, a division of FOCUS Investment Banking.",
+  "main": "dist/index.html",
+  "scripts": {
+    "build": "node build.js",
+    "start": "node build.js && open dist/index.html",
+    "preview": "open dist/index.html"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Focus West",
+  "license": "UNLICENSED"
+}

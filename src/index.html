@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Focus West — Pitch (build-20260518-0435)</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- ─── Password gate (client-side; edit PITCH_PASSWORD in the JS to change the access code) ─── -->
+<div class="gate" id="pitchGate" role="dialog" aria-labelledby="gateTitle">
+  <div class="gate-card">
+    <div class="gate-brand">
+      <span class="focus">Focus</span><span class="west">West</span>
+    </div>
+    <h1 class="gate-title" id="gateTitle">Confidential <em>pitch.</em></h1>
+    <p class="gate-sub">This deck is prepared for the named recipient. Please enter the access code provided in your invitation.</p>
+    <form class="gate-form" id="gateForm">
+      <input type="password" class="gate-input" id="gateInput" placeholder="Access code" autocomplete="off" autofocus />
+      <button type="submit" class="gate-btn">Unlock →</button>
+    </form>
+    <div class="gate-err" id="gateErr"></div>
+    <div class="gate-foot">Focus Investment Banking · FINRA / SIPC</div>
+  </div>
+</div>
+
+<!-- ─── Header ─── -->
+<header class="header">
+  <div class="brand">
+    <div class="brand-mark">
+      <span>Focus</span><span class="west">West</span>
+    </div>
+    <div class="brand-divider"></div>
+    <div class="parent-mark">A division of <strong>Focus Investment Banking</strong></div>
+  </div>
+  <div class="header-right">
+    <div class="section-indicator"><span class="num" id="curSec">01</span> / <span id="totSec">11</span></div>
+    <button class="share-btn" id="shareBtn" title="Copy a private link to this deck">Send to self</button>
+    <button class="present-btn" id="presentBtn" title="Toggle presentation mode (F)">Present</button>
+  </div>
+</header>
+
+<!-- ─── Side nav ─── -->
+<nav class="side-nav" id="sideNav"></nav>
+
+<!-- ─── Sections ─── -->
+<main>
+
+  <!-- 01: COVER -->
+  <section class="deck-section" id="cover" data-section="01" data-label="Cover">
+    <div class="container reveal">
+      <div class="cover-top">
+        <div>
+          <div class="cover-prep" id="cv-prep">Prepared for</div>
+          <div class="cover-client" id="cv-client">—</div>
+          <div class="industry" id="cv-industry">—</div>
+        </div>
+        <div class="cover-meta">
+          <div><span class="accent">Confidential</span></div>
+          <div id="cv-date">—</div>
+          <div id="cv-type">—</div>
+        </div>
+      </div>
+      <h1 class="cover-headline">
+        <span class="line" id="cv-h1">—</span>
+        <span class="line"><em id="cv-h2">—</em></span>
+      </h1>
+      <div class="cover-sub" id="cv-sub">—</div>
+      <div class="cover-team" id="cv-team"></div>
+    </div>
+  </section>
+
+  <!-- 02: SNAPSHOT (Company A at a glance) -->
+  <section class="deck-section" id="snapshot" data-section="02" data-label="Snapshot">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">— Company snapshot</div>
+        <h2 class="section-title" id="snapTitle">— · <em>at a glance.</em></h2>
+        <p class="section-sub" id="snapSub">—</p>
+      </div>
+      <div class="snapshot reveal">
+        <div class="snapshot-stats" id="snapStats"></div>
+        <div class="snapshot-map-card">
+          <div class="snapshot-map-title">Locations</div>
+          <div class="snapshot-map" id="snapMap"></div>
+          <div class="snapshot-map-markets" id="snapMapMarkets"></div>
+        </div>
+      </div>
+      <div class="snapshot-trajectory reveal">
+        <div class="snapshot-trajectory-meta">
+          <div class="snapshot-trajectory-lbl">Trajectory</div>
+          <div class="snapshot-trajectory-cagr"><span id="snapCagr">—</span><span style="font-size:0.5em;color:var(--text-3);font-family:var(--font-mono);margin-left:6px;letter-spacing:0.04em;">% CAGR</span></div>
+          <div class="snapshot-trajectory-cagr-note" id="snapTrajCaption">—</div>
+        </div>
+        <div class="snapshot-trajectory-chart" id="snapTrajChart"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03: TEAM -->
+  <section class="deck-section" id="team" data-section="03" data-label="Team">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">01 — Team</div>
+        <h2 class="section-title">Founder-led. <em>Banker-backed.</em></h2>
+        <p class="section-sub">Three operators with successful exits, supported by FOCUS Investment Banking's national platform.</p>
+      </div>
+      <div class="team-grid reveal-stagger" id="teamGrid"></div>
+    </div>
+  </section>
+
+  <!-- 03: PLATFORM -->
+  <section class="deck-section" id="platform" data-section="03" data-label="Platform">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">02 — Platform</div>
+        <h2 class="section-title">The Focus platform <em>behind us.</em></h2>
+        <p class="section-sub">Founder-led perspective, supported by an established middle-market investment bank.</p>
+      </div>
+      <div class="stats-grid reveal-stagger" id="statsGrid"></div>
+      <div class="deals-wall reveal">
+        <div class="deals-wall-head">
+          <span>Recent transactions · Focus Investment Banking</span>
+          <span style="color: var(--text-4); font-size: 9px;">Hover to pause</span>
+        </div>
+        <div class="deals-wall-track">
+          <div class="deals-wall-strip" id="dealsStrip"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04: FOUNDER VALUES -->
+  <section class="deck-section" id="values" data-section="04" data-label="What matters">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">03 — What matters to you</div>
+        <h2 class="section-title">What founders care about <em>in a sale.</em></h2>
+        <p class="section-sub">We have been in your shoes — so we design the process around what owners actually care about.</p>
+      </div>
+      <div class="values-affordance reveal">
+        <span class="values-affordance-hint">Drag any card to weight what matters most to you</span>
+        <button class="values-reset" id="valuesReset" type="button">Reset order</button>
+      </div>
+      <div class="values-grid reveal-stagger" id="valuesGrid"></div>
+      <div class="pull-quote reveal" id="valuesQuote">—</div>
+    </div>
+  </section>
+
+  <!-- 05: BUYER STRATEGY -->
+  <section class="deck-section" id="buyers" data-section="05" data-label="Buyer strategy">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">04 — Buyer strategy</div>
+        <h2 class="section-title">Four buyer types. <em>One outcome.</em></h2>
+        <p class="section-sub">We run a tight, parallel field across the buyer universe so price is set by competition, not by a single offer.</p>
+      </div>
+      <div class="buyers-grid reveal-stagger" id="buyersGrid"></div>
+      <div class="buyers-takeaway reveal" id="buyersTakeaway">—</div>
+    </div>
+  </section>
+
+  <!-- 06: PROCESS -->
+  <section class="deck-section" id="process" data-section="06" data-label="Process">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">05 — Process</div>
+        <h2 class="section-title">Build the story. Run the field. <em>Protect the outcome.</em></h2>
+        <p class="section-sub">A confidential, disciplined sell-side process designed to create competitive tension at every stage.</p>
+      </div>
+      <div class="process-grid reveal-stagger" id="processGrid"></div>
+      <div class="funnel reveal-stagger" id="funnelGrid"></div>
+    </div>
+  </section>
+
+  <!-- RISKS -->
+  <section class="deck-section" id="risks" data-section="07" data-label="Risks">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">— Risks & mitigations</div>
+        <h2 class="section-title">What could go wrong — <em>and how we handle it.</em></h2>
+        <p class="section-sub">Most bankers skip this slide. We don't. The diligence drag, the working capital surprise, the key-person discount — they're real, and they're avoidable when you prepare for them. Here's our honest list and our playbook.</p>
+      </div>
+      <div class="risks-grid reveal-stagger" id="risksGrid"></div>
+    </div>
+  </section>
+
+  <!-- 07: VALUE DRIVERS -->
+  <section class="deck-section" id="drivers" data-section="07" data-label="Value drivers">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">06 — Value drivers</div>
+        <h2 class="section-title">Business <em>valuation.</em></h2>
+        <p class="section-sub">Buyers underwrite the repeatability of the store model as much as the current earnings. We frame both.</p>
+      </div>
+      <div class="drivers-grid reveal-stagger" id="driversGrid"></div>
+      <div class="drivers-footer reveal">We translate each driver into the buyer's underwriting case — not just into a memo.</div>
+    </div>
+  </section>
+
+  <!-- 08: VALUATION (hero) -->
+  <section class="deck-section" id="valuation" data-section="08" data-label="Valuation">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">07 — Valuation</div>
+        <h2 class="section-title">Preliminary <em>valuation range.</em></h2>
+      </div>
+
+      <div class="val-hero">
+        <div class="val-range-block reveal">
+          <div class="val-range-label">Preliminary Enterprise Value</div>
+          <div class="val-range-value" id="valRange">
+            <span class="currency">$</span><span id="valLow">—</span><span class="dash">—</span><span class="currency">$</span><span id="valHigh">—</span><span class="unit">M</span>
+          </div>
+          <div class="val-approach" id="valApproach">—</div>
+          <div class="val-caveat" id="valCaveat">—</div>
+        </div>
+
+        <div class="val-stats reveal">
+          <div class="val-stat">
+            <div class="val-stat-label">2025 Revenue</div>
+            <div class="val-stat-value"><span class="small">$</span><span id="rev2025">—</span>M</div>
+            <div class="val-stat-meta" id="revYoy">—</div>
+          </div>
+          <div class="val-stat">
+            <div class="val-stat-label">2025 Adj. EBITDA</div>
+            <div class="val-stat-value"><span class="small">$</span><span id="ebitda2025">—</span>M</div>
+            <div class="val-stat-meta" id="ebitdaMargin">—</div>
+          </div>
+          <div class="val-stat">
+            <div class="val-stat-label">EBITDA Support</div>
+            <div class="val-stat-value"><span id="ebitdaMultLow">—</span>–<span id="ebitdaMultHigh">—</span>x</div>
+            <div class="val-stat-meta muted" id="ebitdaImpl">—</div>
+          </div>
+          <div class="val-stat">
+            <div class="val-stat-label">Revenue Cross-check</div>
+            <div class="val-stat-value"><span id="revMultLow">—</span>–<span id="revMultHigh">—</span>x</div>
+            <div class="val-stat-meta muted" id="revImpl">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="val-viz reveal">
+        <div class="val-viz-title">Methodology blend · how the range is supported</div>
+        <div class="val-plot" id="valPlot">
+          <div class="val-plot-row">
+            <div class="val-plot-label">Blended headline <span class="impl" id="vpHeadlineImpl">—</span></div>
+            <div class="val-plot-bar blended" id="vpBarBlended"></div>
+          </div>
+          <div class="val-plot-row">
+            <div class="val-plot-label">EBITDA approach <span class="impl" id="vpEbitdaImpl">—</span></div>
+            <div class="val-plot-bar ebitda" id="vpBarEbitda"></div>
+          </div>
+          <div class="val-plot-row">
+            <div class="val-plot-label">Revenue cross-check <span class="impl" id="vpRevenueImpl">—</span></div>
+            <div class="val-plot-bar revenue" id="vpBarRevenue"></div>
+          </div>
+          <div class="val-plot-axis" id="valAxis"></div>
+        </div>
+      </div>
+
+      <div class="val-tweak reveal">
+        <div class="val-tweak-head">
+          <div class="val-tweak-title">Live sensitivity · drag the EBITDA multiple</div>
+          <button class="val-tweak-reset" id="tweakReset" type="button">Reset to deck</button>
+        </div>
+        <div class="val-slider">
+          <div class="val-slider-track"><div class="val-slider-range" id="sliderRange"></div></div>
+          <input type="range" min="3.0" max="8.0" step="0.1" value="4.5" id="multLow" aria-label="Low EBITDA multiple" />
+          <input type="range" min="3.0" max="8.0" step="0.1" value="6.0" id="multHigh" aria-label="High EBITDA multiple" />
+          <div class="val-slider-labels"><span>3.0x</span><span>4.0x</span><span>5.0x</span><span>6.0x</span><span>7.0x</span><span>8.0x</span></div>
+        </div>
+        <div class="val-tweak-readout">
+          <div class="val-tweak-readout-lbl">Implied EV<span class="mult" id="multReadout">4.5x – 6.0x</span></div>
+          <div class="val-tweak-readout-val"><span class="small">$</span><span id="tweakLow">4.59</span><span class="dash">—</span><span class="small">$</span><span id="tweakHigh">6.12</span><span class="unit">M</span></div>
+        </div>
+      </div>
+
+      <div class="val-norm reveal">
+        <div class="val-norm-tag">Normalization Opportunity</div>
+        <div class="val-norm-body" id="valNorm">—</div>
+      </div>
+      <div class="val-source reveal" id="valSource">—</div>
+    </div>
+  </section>
+
+  <!-- COMPARABLE TRANSACTIONS -->
+  <section class="deck-section" id="comparables" data-section="09" data-label="Comparables">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">— Comparable transactions</div>
+        <h2 class="section-title">Where you sit — <em>against the comp set.</em></h2>
+        <p class="section-sub">Seven completed coffee and multi-unit F&amp;B transactions in the last four years. Highlighted rows are within or adjacent to our valuation range. We're showing the full distribution — not the cherry-picked favorable comps.</p>
+      </div>
+      <div class="comps-card reveal">
+        <div class="comps-head">
+          <div>Target</div><div>Year</div><div>EV</div><div>EV/EBITDA</div><div>EV/Rev</div><div>Buyer type</div>
+        </div>
+        <div id="compsRows"></div>
+        <div class="comps-summary" id="compsSummary">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT-IF SCENARIOS -->
+  <section class="deck-section" id="scenarios" data-section="10" data-label="Scenarios">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">— What-if scenarios</div>
+        <h2 class="section-title">Three doors. <em>You choose.</em></h2>
+        <p class="section-sub">Same business, three structures. Different expected EV, founder retention, hold period, and control implications. Click any card to see the implications expand and to flow that structure through to the founder takeaway model below.</p>
+      </div>
+      <div class="scenario-grid reveal-stagger" id="scenarioGrid"></div>
+    </div>
+  </section>
+
+  <!-- NET PROCEEDS WATERFALL -->
+  <section class="deck-section" id="waterfall" data-section="11" data-label="Founder takeaway">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">— Founder takeaway</div>
+        <h2 class="section-title">What hits your <em>bank account.</em></h2>
+        <p class="section-sub">Live waterfall from headline EV to your net proceeds, after the deductions that buyers and lawyers actually apply. Adjust transaction value, your ownership stake, basis, and state to model your real outcome.</p>
+      </div>
+
+      <div class="wf-card reveal">
+        <div class="wf-head">
+          <div class="wf-title-tag">Net proceeds model · live</div>
+          <button class="wf-reset" id="wfReset" type="button">Reset</button>
+        </div>
+
+        <div class="wf-inputs">
+          <div class="wf-input">
+            <div class="wf-input-lbl">Transaction value</div>
+            <div class="wf-input-row">
+              <input type="range" min="3" max="12" step="0.05" value="6.2" id="wfTv" aria-label="Transaction value" />
+              <output class="wf-input-out"><span class="cur">$</span><span id="wfTvOut">6.20</span><span class="unit">M</span></output>
+            </div>
+          </div>
+          <div class="wf-input">
+            <div class="wf-input-lbl">Your ownership</div>
+            <div class="wf-input-row">
+              <input type="range" min="20" max="100" step="1" value="82" id="wfOwn" aria-label="Ownership percent" />
+              <output class="wf-input-out"><span id="wfOwnOut">82</span><span class="unit">%</span></output>
+            </div>
+          </div>
+          <div class="wf-input">
+            <div class="wf-input-lbl">Cost basis</div>
+            <div class="wf-input-row">
+              <input type="range" min="0" max="2000" step="10" value="180" id="wfBasis" aria-label="Cost basis" />
+              <output class="wf-input-out"><span class="cur">$</span><span id="wfBasisOut">180</span><span class="unit">K</span></output>
+            </div>
+          </div>
+          <div class="wf-input">
+            <div class="wf-input-lbl">State</div>
+            <select id="wfState" class="wf-input-select"></select>
+          </div>
+        </div>
+
+        <div class="wf-chart" id="wfChart"></div>
+
+        <div class="wf-banner">
+          <div class="wf-banner-lbl">Your net at <span class="accent" id="wfBannerTv">$6.20M</span> close</div>
+          <div class="wf-banner-val"><span class="small">$</span><span id="wfBannerNet">—</span><span class="unit">M</span></div>
+        </div>
+
+        <div class="wf-disclaimer">Illustrative model. Actual proceeds depend on transaction structure, working capital settlement, deal expenses, and individual tax circumstances. Not a tax projection — consult your CPA and counsel for binding analysis.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09: ENGAGEMENT TERMS -->
+  <section class="deck-section" id="terms" data-section="09" data-label="Engagement">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">08 — Engagement terms</div>
+        <h2 class="section-title">How we get paid — <em>and why it aligns us with you.</em></h2>
+        <p class="section-sub">Most of our economics are tied to closing at the right outcome. The retainer keeps the process resourced; the success fee is where we win when you do.</p>
+      </div>
+      <div class="terms-table reveal-stagger" id="termsTable"></div>
+
+      <div class="fee-calc reveal">
+        <div class="fee-calc-head">
+          <div class="fee-calc-title">Live alignment · drag a hypothetical transaction value</div>
+          <button class="fee-calc-reset" id="feeReset" type="button">Reset</button>
+        </div>
+        <div class="fee-slider">
+          <div class="fee-slider-track"><div class="fee-slider-fill" id="feeFill"></div></div>
+          <input type="range" min="3.0" max="12.0" step="0.05" value="5.25" id="feeTv" aria-label="Hypothetical transaction value" />
+          <div class="fee-slider-labels"><span>$3M</span><span>$5M</span><span>$7M</span><span>$9M</span><span>$11M</span></div>
+        </div>
+        <div class="fee-readout">
+          <div class="fee-readout-row">
+            <div class="fee-readout-lbl">At a <span class="accent" id="feeTvLbl">$5.25M</span> close →</div>
+            <div class="fee-readout-val">
+              <span class="small">$</span><span id="feeAmount">184</span><span class="kunit">K</span>
+              <span class="fee-pct" id="feePct">3.5%</span>
+            </div>
+          </div>
+          <div class="fee-meta">Success fee per the engagement letter · minimum 3.5% of transaction value · majority of our economics ride on close.</div>
+        </div>
+      </div>
+
+      <div class="engagement-closer reveal"><span class="accent">We win</span> when you win.</div>
+    </div>
+  </section>
+
+  <!-- 10: ROADMAP -->
+  <section class="deck-section" id="roadmap" data-section="10" data-label="Roadmap">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">09 — Roadmap</div>
+        <h2 class="section-title">A clear path to <em>the right outcome.</em></h2>
+        <p class="section-sub">Indicative timeline. Pace flexes around the readiness work in weeks 1–6.</p>
+      </div>
+
+      <div class="roadmap-track reveal">
+        <div class="roadmap-axis"></div>
+        <div class="roadmap-bars" id="roadmapBars"></div>
+        <div class="roadmap-week-labels">
+          <span>Week 1</span><span>Week 8</span><span>Week 16</span><span>Week 22</span><span>Week 26</span>
+        </div>
+      </div>
+
+      <div class="roadmap-grid reveal-stagger" id="roadmapGrid"></div>
+
+      <div class="roadmap-cta reveal">
+        <div class="roadmap-cta-text" id="roadmapCta">—</div>
+        <div class="roadmap-cta-arrow">Book session →</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11: DISCLAIMER -->
+  <section class="deck-section" id="disclaimer" data-section="11" data-label="Disclaimer">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">10 — Important information</div>
+        <h2 class="section-title" style="font-size: clamp(28px, 3.5vw, 44px);">Important <em>information.</em></h2>
+        <p class="disclaimer-body" id="disclaimerBody">—</p>
+      </div>
+      <div class="footer-mark reveal">
+        <div><span class="accent">Focus</span> West &nbsp; · &nbsp; A division of Focus Investment Banking LLC</div>
+        <div>FINRA / SIPC &nbsp; · &nbsp; Securities via Focus Securities LLC</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Audio narration player (auto-hides if no audio files present) -->
+<div class="audio-player" id="audioPlayer" role="region" aria-label="Section narration">
+  <button class="audio-play-btn" id="audioPlay" aria-label="Play / pause section narration">▶</button>
+  <div class="audio-info">
+    <div class="audio-info-section" id="audioSec">SECTION 01</div>
+    <div class="audio-info-title" id="audioTitle">—</div>
+    <div class="audio-progress"><div class="audio-progress-bar" id="audioBar"></div></div>
+  </div>
+  <div class="audio-controls-right">
+    <button class="audio-auto-toggle" id="audioAuto" title="Auto-advance to next section's audio when current ends">Auto</button>
+    <button class="audio-close" id="audioClose" aria-label="Dismiss audio player">×</button>
+  </div>
+  <audio id="audioEl" preload="metadata"></audio>
+</div>
+
+<!-- Toast (for share-link confirmation, etc.) -->
+<div class="toast" id="toast" role="status" aria-live="polite">Link copied</div>
+
+<script src="app.js"></script>
+</body>
+</html>
