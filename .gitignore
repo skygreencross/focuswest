@@ -1,0 +1,17 @@
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+dist/
+build/
+.vscode/
+.idea/
+*.swp
+*~
+
+# Working / reference artifacts that shouldn't ship
+_ref/
+team-photos/pdfimg-*
+
+# Audio MP3s are typically heavy — uncomment if you don't want them tracked in git
+# audio-narration/*.mp3
