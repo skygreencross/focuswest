@@ -1307,17 +1307,17 @@ const FALLBACK_DATA = {
     { title:"Channel mix", body:"Wholesale, e-comm, and CPG channels that diversify the platform.", spark:{type:"stacked",segments:[{label:"In-store",value:72},{label:"Wholesale",value:14},{label:"E-comm",value:9},{label:"CPG",value:5}],caption:"Revenue mix · 2025"}}
   ],
   valuation: {
-    range_low_m:4.3, range_high_m:6.2,
-    approach:"Blended EBITDA / revenue approach against 2025 results.",
+    range_low_m:4.0, range_high_m:6.0,
+    approach:"Blended EBITDA / revenue approach against trailing results.",
     caveat:"Subject to diligence, buyer feedback, working capital peg, and deal structure.",
-    revenue_2025_m:9.36, revenue_yoy_pct:29.4,
-    ebitda_2025_m:1.02, ebitda_margin_pct:10.9,
+    revenue_2025_m:10.0, revenue_yoy_pct:20.0,
+    ebitda_2025_m:1.0, ebitda_margin_pct:10.0,
     ebitda_multiple_low:4.5, ebitda_multiple_high:6.0,
-    ebitda_implied_low_m:4.6, ebitda_implied_high_m:6.1,
-    revenue_multiple_low:0.6, revenue_multiple_high:0.8,
-    revenue_implied_low_m:5.6, revenue_implied_high_m:7.5,
-    normalization_note:"2024 Adj. EBITDA was $1.19M (16.4% margin). If 2025 cost pressure (outsource labor, rent, professional fees) is explainable and reversible, the higher end of the range is more credible.",
-    source:"Company A internal valuation memo and 2024/2025 standalone P&L"
+    ebitda_implied_low_m:4.5, ebitda_implied_high_m:6.0,
+    revenue_multiple_low:0.5, revenue_multiple_high:0.8,
+    revenue_implied_low_m:5.0, revenue_implied_high_m:8.0,
+    normalization_note:"Sample normalization note. Actual figures load from the client sheet.",
+    source:"Company A — illustrative only"
   },
   engagement_terms: [
     { term:"Retainer", value:"$8,000 monthly / launch", detail:"Keeps the process resourced; credit treatment finalized in the engagement letter."},
@@ -1344,7 +1344,7 @@ const FALLBACK_DATA = {
    browser dev tools can bypass it. For real auth, use Netlify Pro
    site protection or Vercel password-protected previews.
 ─────────────────────────────────────────────────────────────────── */
-const PITCH_PASSWORD = 'aroma2026';
+const PITCH_PASSWORD = '';
 const GATE_KEY = 'fw-pitch-unlocked-v1';
 
 /* While the gate is up we load data in the background. Rendering is deferred

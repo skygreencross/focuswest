@@ -56,23 +56,11 @@ function build() {
   // ─── Read source files ───
   const css = readFile(path.join(SRC, 'styles.css'));
   const js = readFile(path.join(SRC, 'app.js'));
-  const dataRaw = readFile(path.join(SRC, 'data.json'));
-  const data = JSON.parse(dataRaw);
   const template = readFile(path.join(SRC, 'index.html'));
 
   console.log(`  styles.css ${(css.length / 1024).toFixed(1)} KB`);
   console.log(`  app.js     ${(js.length / 1024).toFixed(1)} KB`);
-  console.log(`  data.json  ${(dataRaw.length / 1024).toFixed(1)} KB`);
-
-  // ─── Inline team photos as data URIs ───
-  const bundled = inlinePhotos(JSON.parse(JSON.stringify(data)));
-  const bundledJson = JSON.stringify(bundled, null, 2);
-
-  // Defensively escape </ inside string values so it can't close our <script> tag.
-  // JSON.parse handles `\/` as an unescape on re-parse.
-  const safeBundled = bundledJson.replace(/<\//g, '<\\/');
-
-  console.log(`  bundled data (with photos) ${(safeBundled.length / 1024).toFixed(1)} KB`);
+  console.log(`  (client data not bundled — deck fetches live from Apps Script)`);
 
   // ─── Replace template links with inlined blocks ───
   let html = template;
@@ -88,12 +76,6 @@ function build() {
   html = html.replace(
     /<link\s+rel="stylesheet"\s+href="styles\.css"\s*\/?>/,
     () => `<style>\n${css}\n</style>`
-  );
-
-  // Insert bundled-data right after <body>
-  html = html.replace(
-    /<body>\s*/,
-    () => `<body>\n\n<script type="application/json" id="bundled-data">\n${safeBundled}\n</script>\n\n`
   );
 
   // Replace <script src="app.js"></script> with inline <script>
