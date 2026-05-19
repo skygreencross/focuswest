@@ -41,13 +41,15 @@ async function loadData() {
         const live = await res.json();
         if (live && !live.error) {
           DATA = live;
-          console.log('Loaded live data for client:', clientId);
+          console.log('[FW] Loaded live data for client:', clientId);
         } else if (live && live.error) {
-          console.warn('Sheet API error:', live.error, '— falling back to bundled data');
+          console.error('[FW] Sheet API error:', live.error);
         }
+      } else {
+        console.error('[FW] Sheet fetch bad status:', res.status, res.url);
       }
     } catch (e) {
-      console.warn('Sheet fetch failed, using bundled data:', e);
+      console.error('[FW] Sheet fetch failed (likely CORS):', e.message, '\nURL:', SHEET_API_URL);
     }
   }
 
