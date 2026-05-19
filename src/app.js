@@ -371,7 +371,8 @@ function renderWaterfall(d) {
   const w = d.waterfall;
   const sel = $('#wfState');
   if (sel && !sel.dataset.built) {
-    sel.innerHTML = (w.states || []).map(s => `<option value="${s.rate}" ${s.name === w.default_state ? 'selected' : ''}>${s.name} · ${s.rate}%</option>`).join('');
+    const states = Array.isArray(w.states) ? w.states : [];
+    sel.innerHTML = states.map(s => `<option value="${s.rate}" ${s.name === w.default_state ? 'selected' : ''}>${s.name} · ${s.rate}%</option>`).join('');
     sel.dataset.built = '1';
   }
   $('#wfTv').value    = w.default_tv_m;
@@ -456,7 +457,7 @@ function wireWaterfall() {
     $('#wfOwn').value = w.default_ownership_pct;
     $('#wfBasis').value = w.default_basis_k;
     const sel = $('#wfState');
-    const def = w.states.find(s => s.name === w.default_state);
+    const def = Array.isArray(w.states) && w.states.find(s => s.name === w.default_state);
     if (sel && def) sel.value = def.rate;
     updateWaterfall();
   });
