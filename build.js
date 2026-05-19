@@ -49,6 +49,18 @@ function inlinePhotos(data) {
   return data;
 }
 
+function copyPhotos() {
+  const src = path.join(SRC, 'team-photos');
+  const dst = path.join(DIST, 'team-photos');
+  if (!fs.existsSync(dst)) fs.mkdirSync(dst, { recursive: true });
+  const named = ['conor-miller.jpg', 'skyler-pinnick.jpg', 'jared-peterson.jpg'];
+  named.forEach(f => {
+    const s = path.join(src, f), d = path.join(dst, f);
+    if (fs.existsSync(s)) { fs.copyFileSync(s, d); console.log(`  photo → dist/team-photos/${f}`); }
+    else console.warn(`  ⚠ photo not found: ${f}`);
+  });
+}
+
 function build() {
   console.log('Building dist/index.html …');
   if (!fs.existsSync(DIST)) fs.mkdirSync(DIST, { recursive: true });
@@ -87,6 +99,9 @@ function build() {
   // ─── Write dist/index.html ───
   const outPath = path.join(DIST, 'index.html');
   fs.writeFileSync(outPath, html, 'utf8');
+
+  // ─── Copy team photos ───
+  copyPhotos();
 
   console.log(`\n✓ Wrote dist/index.html — ${(html.length / 1024).toFixed(1)} KB`);
   console.log(`  Build stamp: ${stamp}`);
