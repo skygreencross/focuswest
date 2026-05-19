@@ -147,6 +147,12 @@ A useful first task: a Playwright smoke test that renders `dist/index.html` head
 
 ---
 
+## Current state — read HANDOFF.md first
+
+**`HANDOFF.md` is the most up-to-date file.** It captures the exact state of the project, the live Apps Script URL, the Google Sheet ID, the account it lives under, and what's pending. Read that before doing any work — it tells you what's already done and what to pick up.
+
+The Google Sheets backend is **wired but uncommitted on disk** (a previous sandbox couldn't write to .git/). The Apps Script is deployed and live. The new `dist/index.html` references the live URL but hasn't yet been pushed to Netlify.
+
 ## When in doubt
 
-Read `ARCHITECTURE.md` for deeper technical context on specific subsystems (the waterfall math, the audio player, the bundle/unbundle script). Read `BACKEND_BRIEF.md` for the next phase's spec.
+Read `HANDOFF.md` for current state. Read `BACKEND_BRIEF.md` for the original architecture spec.

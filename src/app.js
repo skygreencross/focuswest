@@ -3,24 +3,72 @@ let DATA = null;
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 
-async function boot() {
-  // 1. Inline bundled data — always available, loads synchronously, zero network.
+/* ─── Backend ────────────────────────────────────────────────────────────────
+   Google Sheets-backed pitch data. The Apps Script reads the Pitches sheet
+   and returns this client's row as JSON in the shape the deck expects.
+
+   To repoint at a different sheet/script, replace SHEET_API_URL with the new
+   deployment URL. To go fully offline, set it to empty string — bundled data
+   will be used unconditionally.
+
+   URL shape:  SHEET_API_URL?client=<clientId>
+   Visit the deck as:  https://yourhost/?client=aroma
+─────────────────────────────────────────────────────────────────────────── */
+const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbz8JxwoIASjU51ch1dB_fchnPIwem3soQuHL7rqndSf97Lh9sPGWPCu8nefiCw7isGr/exec';
+
+async function loadData() {
+  // 1. Inline bundled data — always available, loads synchronously. This is
+  //    our offline / fallback dataset. If the live fetch succeeds below, we
+  //    overwrite DATA with the fresh content.
   const bundled = document.getElementById('bundled-data');
   if (bundled) {
     try { DATA = JSON.parse(bundled.textContent); }
     catch (e) { console.warn('Bundled JSON parse failed:', e); }
   }
-  // 2. Optional fetch of data.json — only matters when served via HTTP for live edits.
-  //    If the fetch succeeds, the file overrides the bundled data; otherwise we keep bundled.
-  try {
-    const res = await fetch('./data.json');
-    if (res.ok) {
-      const overlay = await res.json();
-      if (overlay && typeof overlay === 'object') DATA = overlay;
+
+  // 2. Determine clientId from URL (?client=aroma). If absent, we'll keep
+  //    the bundled data so the deck still renders when opened via file://
+  //    without a query string.
+  const urlParams = new URLSearchParams(window.location.search);
+  const clientId = (urlParams.get('client') || '').toLowerCase().trim();
+
+  // 3. If we have a sheet endpoint AND a clientId, fetch live data.
+  if (SHEET_API_URL && clientId) {
+    try {
+      const apiUrl = SHEET_API_URL + '?client=' + encodeURIComponent(clientId);
+      const res = await fetch(apiUrl, { redirect: 'follow' });
+      if (res.ok) {
+        const live = await res.json();
+        if (live && !live.error) {
+          DATA = live;
+          console.log('Loaded live data for client:', clientId);
+        } else if (live && live.error) {
+          console.warn('Sheet API error:', live.error, '— falling back to bundled data');
+        }
+      }
+    } catch (e) {
+      console.warn('Sheet fetch failed, using bundled data:', e);
     }
-  } catch (e) { /* fine — bundled data is in play */ }
-  // 3. Last-resort minimal fallback (only if bundled was somehow stripped)
+  }
+
+  // 4. Dev-mode override: when serving src/ via HTTP without a ?client= param,
+  //    prefer a local data.json if one is present alongside the page.
+  if (!clientId) {
+    try {
+      const res = await fetch('./data.json');
+      if (res.ok) {
+        const overlay = await res.json();
+        if (overlay && typeof overlay === 'object') DATA = overlay;
+      }
+    } catch (e) { /* fine — bundled data is in play */ }
+  }
+
+  // 5. Last-resort minimal fallback (only if bundled was somehow stripped)
   if (!DATA) DATA = FALLBACK_DATA;
+  return DATA;
+}
+
+function renderAndWire() {
   render(DATA);
   wireNav();
   wireReveal();
@@ -42,6 +90,11 @@ async function boot() {
   wireShareButton();
   wireAudioPlayer();
   autoNumberEyebrows();
+}
+
+async function boot() {
+  await loadData();
+  renderAndWire();
 }
 
 /* ─── Auto-number section eyebrows from DOM order ─── */
@@ -1294,23 +1347,39 @@ const FALLBACK_DATA = {
 const PITCH_PASSWORD = 'aroma2026';
 const GATE_KEY = 'fw-pitch-unlocked-v1';
 
+/* While the gate is up we load data in the background. Rendering is deferred
+   until the user enters the right access code so animations don't fire under
+   the overlay. Two passwords are accepted: the per-client password from the
+   loaded data (DATA.client.pitch_password), or the hardcoded fallback below
+   (which also covers the offline / bundled-only case). */
+let _dataPromise = null;
+function ensureData() {
+  if (!_dataPromise) _dataPromise = loadData();
+  return _dataPromise;
+}
+
 function setupGate() {
   const gate = document.getElementById('pitchGate');
   if (!gate) return true;
-  if (!PITCH_PASSWORD) { gate.classList.add('hidden'); return true; }
+  if (!PITCH_PASSWORD && !SHEET_API_URL) { gate.classList.add('hidden'); return true; }
   if (sessionStorage.getItem(GATE_KEY) === '1') {
     gate.classList.add('hidden');
     return true;
   }
+  ensureData(); // warm up the network in the background
   const form = document.getElementById('gateForm');
   const input = document.getElementById('gateInput');
   const err = document.getElementById('gateErr');
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (input.value === PITCH_PASSWORD) {
+    err.classList.remove('show');
+    await ensureData();
+    const liveCode = DATA && DATA.client && DATA.client.pitch_password;
+    const ok = (liveCode && input.value === liveCode) || (input.value === PITCH_PASSWORD);
+    if (ok) {
       sessionStorage.setItem(GATE_KEY, '1');
       gate.classList.add('hidden');
-      boot();
+      renderAndWire();
     } else {
       err.textContent = 'Access code not recognized.';
       err.classList.add('show');
