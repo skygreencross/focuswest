@@ -1344,7 +1344,7 @@ const FALLBACK_DATA = {
    browser dev tools can bypass it. For real auth, use Netlify Pro
    site protection or Vercel password-protected previews.
 ─────────────────────────────────────────────────────────────────── */
-const PITCH_PASSWORD = '';
+const PITCH_PASSWORD = 'aroma2026';
 const GATE_KEY = 'fw-pitch-unlocked-v1';
 
 /* While the gate is up we load data in the background. Rendering is deferred
